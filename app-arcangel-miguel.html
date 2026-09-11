@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcángel Miguel — App</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f2f2f2;
+    color: #222;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  h2 { font-size: 18px; margin-top: 0; }
+  p.subtitle { color: #666; margin-top: 0; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  button {
+    font-family: inherit;
+    font-size: 15px;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #999;
+    background: #fff;
+    cursor: pointer;
+  }
+  .nav-btn { text-align: left; padding: 18px 14px; }
+  .nav-btn .label { display: block; font-weight: bold; }
+  .nav-btn .desc { display: block; font-size: 12px; color: #666; margin-top: 4px; }
+  .back-btn { margin-bottom: 16px; background: none; border: none; color: #333; font-size: 14px; padding: 4px 0; }
+  .primary-btn { background: #333; color: #fff; border: none; width: 100%; margin-top: 10px; }
+  .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  textarea {
+    width: 100%; min-height: 70px; font-family: inherit; font-size: 14px;
+    padding: 10px; border-radius: 6px; border: 1px solid #ccc; margin-top: 6px; margin-bottom: 16px;
+  }
+  .step-counter { font-size: 13px; color: #666; margin-bottom: 8px; }
+  .step-box { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 18px; margin-bottom: 16px; min-height: 120px; }
+  .timer { font-size: 28px; text-align: center; margin: 16px 0; font-variant-numeric: tabular-nums; }
+  .row { display: flex; gap: 10px; }
+  .row button { flex: 1; }
+  .entry { border-bottom: 1px solid #eee; padding: 10px 0; }
+  .entry .date { font-size: 12px; color: #999; }
+  .placeholder { color: #888; font-style: italic; padding: 20px 0; }
+  .auth-box { max-width: 320px; margin: 60px auto 0; }
+  .error-msg { color: #b00020; font-size: 13px; margin-top: -8px; margin-bottom: 12px; }
+  .link-btn { background: none; border: none; color: #333; text-decoration: underline; font-size: 13px; padding: 4px 0; }
+  .logout-link { position: absolute; top: 20px; right: 20px; font-size: 12px; color: #888; background: none; border: none; text-decoration: underline; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- AUTENTICACIÓN -->
+<div class="screen active" id="screen-auth">
+  <div class="auth-box">
+    <h1 style="text-align:center;">Arcángel Miguel</h1>
+    <p class="subtitle" style="text-align:center;" id="auth-subtitle">Inicia sesión o crea tu cuenta</p>
+    <label>Correo electrónico</label>
+    <input type="email" id="auth-email" placeholder="tu@correo.com" style="width:100%;padding:12px;margin:6px 0 14px;border-radius:6px;border:1px solid #ccc;font-size:15px;">
+    <label>Contraseña</label>
+    <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" style="width:100%;padding:12px;margin:6px 0 6px;border-radius:6px;border:1px solid #ccc;font-size:15px;">
+    <div class="error-msg" id="auth-error" style="display:none;"></div>
+    <button class="primary-btn" id="auth-submit-btn" onclick="handleAuthSubmit()">Iniciar sesión</button>
+    <div style="text-align:center;margin-top:14px;">
+      <button class="link-btn" id="auth-toggle-btn" onclick="toggleAuthMode()">¿No tienes cuenta? Crear una</button>
+    </div>
+  </div>
+</div>
+
+<!-- INICIO -->
+<div class="screen" id="screen-inicio">
+  <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
+  <h1>Arcángel Miguel</h1>
+  <p class="subtitle">¿Qué necesitas hoy?</p>
+  <div class="grid">
+    <button class="nav-btn" onclick="showScreen('practica')">
+      <span class="label">Practica</span>
+      <span class="desc">Rituales y oraciones</span>
+    </button>
+    <button class="nav-btn" onclick="showScreen('diario')">
+      <span class="label">Diario</span>
+      <span class="desc">Tus reflexiones</span>
+    </button>
+    <button class="nav-btn" onclick="showScreen('explora')">
+      <span class="label">Explora</span>
+      <span class="desc">Conocé a Miguel</span>
+    </button>
+    <button class="nav-btn" onclick="showScreen('altar')">
+      <span class="label">Altar</span>
+      <span class="desc">Tu checklist</span>
+    </button>
+  </div>
+</div>
+
+<!-- PRACTICA -->
+<div class="screen" id="screen-practica">
+  <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
+  <h2>Practica</h2>
+  <div id="practica-lista">
+    <div class="card">
+      <strong>Ritual de Protección</strong>
+      <p style="font-size:13px;color:#666;margin:6px 0;">Para cuando sientes que necesitas un escudo extra.</p>
+      <button class="primary-btn" onclick="startRitual('proteccion')">Comenzar</button>
+    </div>
+    <div class="card">
+      <strong>Ritual de Claridad y Decisión</strong>
+      <p style="font-size:13px;color:#666;margin:6px 0;">Para cuando estás frente a una decisión difícil.</p>
+      <button class="primary-btn" onclick="startRitual('claridad')">Comenzar</button>
+    </div>
+    <div class="card">
+      <strong>Ritual de Manifestación y Propósito</strong>
+      <p style="font-size:13px;color:#666;margin:6px 0;">Para avanzar hacia una meta con coraje.</p>
+      <button class="primary-btn" onclick="startRitual('manifestacion')">Comenzar</button>
+    </div>
+    <div class="card">
+      <strong>Ritual de Corte de Ataduras</strong>
+      <p style="font-size:13px;color:#666;margin:6px 0;">Para soltar lo que ya no sirve.</p>
+      <button class="primary-btn" onclick="startRitual('corte')">Comenzar</button>
+    </div>
+    <div class="card">
+      <strong>Ritual de Protección del Hogar</strong>
+      <p style="font-size:13px;color:#666;margin:6px 0;">Para limpiar y proteger tu espacio.</p>
+      <button class="primary-btn" onclick="startRitual('hogar')">Comenzar</button>
+    </div>
+    <div class="card">
+      <strong>Ritual Nocturno</strong>
+      <p style="font-size:13px;color:#666;margin:6px 0;">Para un descanso protegido.</p>
+      <button class="primary-btn" onclick="startRitual('nocturno')">Comenzar</button>
+    </div>
+  </div>
+
+  <!-- Flujo guiado del ritual -->
+  <div id="ritual-flow" style="display:none;">
+    <h2 id="ritual-titulo" style="font-size:16px;"></h2>
+    <div class="step-counter" id="step-counter"></div>
+    <div class="step-box" id="step-content"></div>
+    <div class="timer" id="step-timer" style="display:none;"></div>
+    <div class="row">
+      <button onclick="ritualPrev()">Anterior</button>
+      <button class="primary-btn" onclick="ritualNext()" id="next-btn">Siguiente</button>
+    </div>
+  </div>
+</div>
+
+<!-- DIARIO -->
+<div class="screen" id="screen-diario">
+  <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
+  <h2>Tu diario con Miguel</h2>
+  <p class="subtitle">Se guarda automáticamente en la nube — disponible desde cualquier dispositivo donde inicies sesión.</p>
+
+  <label><strong>¿De qué necesitas protegerte hoy?</strong></label>
+  <textarea id="q1" placeholder="Escribe acá..."></textarea>
+
+  <label><strong>¿Qué decisión estás postergando?</strong></label>
+  <textarea id="q2" placeholder="Escribe acá..."></textarea>
+
+  <label><strong>Si tuvieras el coraje de Miguel hoy, ¿qué harías distinto?</strong></label>
+  <textarea id="q3" placeholder="Escribe acá..."></textarea>
+
+  <button class="primary-btn" onclick="guardarEntrada()">Guardar</button>
+
+  <h2 style="margin-top:30px;">Entradas anteriores</h2>
+  <div id="lista-entradas"></div>
+</div>
+
+<!-- EXPLORA -->
+<div class="screen" id="screen-explora">
+  <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
+  <h2>Explora</h2>
+
+  <div class="card">
+    <strong>¿Quién es el Arcángel Miguel?</strong>
+    <p style="font-size:14px;line-height:1.5;">Su nombre completo en hebreo es Mikha-El, "¿Quién como Dios?" — un grito de guerra frente a las fuerzas que se rebelaron contra la luz. Es mencionado en las tradiciones judía, cristiana e islámica como jefe de los ejércitos celestiales. El Libro de Enoc lo nombra como uno de siete arcángeles principales (junto a Uriel, Raguel, Rafael, Sariel, Gabriel y Remiel). En la Biblia aparece solo tres veces por nombre: en Daniel (10:13,21 y 12:1), donde se lo describe como el gran príncipe que defiende a su pueblo; en la Carta de Judas (1:9), disputando con el diablo por el cuerpo de Moisés; y en el Apocalipsis (12:7-9), liderando la batalla final contra el dragón y expulsándolo del cielo.</p>
+    <p style="font-size:13px;font-style:italic;color:#666;">Dato curioso: algunas tradiciones cristianas (como los Testigos de Jehová y algunos adventistas) debaten si Miguel es en realidad una manifestación de Cristo mismo — es una lectura minoritaria, no aceptada por el catolicismo ni la ortodoxia, pero circula desde hace siglos.</p>
+  </div>
+
+  <div class="card">
+    <strong>Miguel a través del tiempo</strong>
+    <p style="font-size:14px;line-height:1.5;">Durante siglos se lo representa igual: guerrero con armadura y espada de fuego, alas extendidas, un pie sobre un dragón vencido — nunca matándolo del todo, porque el mal subyugado (no eliminado) es parte del símbolo. La pintura más famosa es la de Guido Reni (1635), en la iglesia de los Capuchinos en Roma, encargada por el cardenal Antonio Barberini. El Monte Gargano en Italia y la Abadía del Monte Saint-Michel en Francia son santuarios construidos tras apariciones que se le atribuyen. El papa Gregorio Magno le atribuyó el fin de una plaga en Roma. En la Edad Media se fundó en su honor la Orden de San Miguel, y su festividad —Michaelmas, el 29 de septiembre— marcaba tradicionalmente ritos antes de campañas militares.</p>
+  </div>
+
+  <div class="card">
+    <strong>Patronazgos y devoción en el mundo</strong>
+    <p style="font-size:14px;line-height:1.5;">Es el santo patrono de soldados, policías, médicos, paramédicos, bomberos, marineros, paracaidistas y radiólogos — de cualquiera cuyo trabajo sea proteger. También patrono de países y ciudades enteras: Vaticano, Francia, Ucrania, Alemania, Bielorrusia, Bruselas, Kiev, Nápoles, Normandía y Filipinas, entre otros. Su festividad se celebra el 29 de septiembre, junto a Gabriel y Rafael.</p>
+  </div>
+
+  <div class="card">
+    <strong>Símbolos y correspondencias</strong>
+    <ul style="font-size:14px;line-height:1.7;padding-left:20px;margin:8px 0;">
+      <li>Color principal: Azul (algunas tradiciones agregan dorado o rojo)</li>
+      <li>Elemento: Fuego</li>
+      <li>Día: Domingo</li>
+      <li>Planeta: El Sol</li>
+      <li>Piedras: Lapislázuli, sodalita, zafiro, cuarzo azul, aventurina azul, labradorita</li>
+      <li>Chakra: Plexo solar</li>
+      <li>Carta de tarot: La Fuerza</li>
+      <li>Aromas/incienso: Mirra, sándalo o ruda (varía según la tradición)</li>
+      <li>Número: 111</li>
+      <li>Festividad: 29 de septiembre</li>
+    </ul>
+    <p style="font-size:12px;color:#888;font-style:italic;">Estas correspondencias vienen de tradiciones esotéricas modernas, no de un único texto religioso — distintas fuentes varían en algún detalle.</p>
+  </div>
+
+  <div class="card">
+    <strong>Preguntas frecuentes</strong>
+    <div style="font-size:14px;line-height:1.5;margin-top:8px;">
+      <p><b>¿Necesito ser religioso para invocarlo?</b><br>No. Solo hace falta intención abierta y respeto.</p>
+      <p><b>¿Puedo pedir protección para otra persona?</b><br>Sí, siempre con buena intención.</p>
+      <p><b>¿Cuántas veces puedo hacer estos rituales?</b><br>Tantas como sientas necesario.</p>
+      <p><b>¿Qué hago si no siento nada después de un ritual?</b><br>La conexión no siempre es inmediata. Presta atención a señales sutiles en los días siguientes.</p>
+      <p><b>¿Por qué a veces se lo asocia con el color rojo o amarillo, no solo azul?</b><br>Distintas escuelas esotéricas asignan colores distintos a cada arcángel. El azul es el más consistente entre fuentes, pero no es universal.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ALTAR -->
+<div class="screen" id="screen-altar">
+  <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
+  <h2>Tu altar</h2>
+  <p class="subtitle">Todos los elementos usados en los rituales y la tradición de Miguel. Marca lo que ya tienes — se guarda en este dispositivo.</p>
+  <div class="card">
+    <div id="altar-lista"></div>
+  </div>
+</div>
+
+<script>
+// ---------- CONEXIÓN A SUPABASE ----------
+const SUPABASE_URL = 'https://ildfejyrqivbxywiuynm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_gD5k8wsee4cua2Diipsjsw_au7ef_pX';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let authMode = 'login'; // 'login' o 'signup'
+let currentUser = null;
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  document.getElementById('auth-submit-btn').textContent = authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
+  document.getElementById('auth-toggle-btn').textContent = authMode === 'login' ? '¿No tienes cuenta? Crear una' : '¿Ya tienes cuenta? Inicia sesión';
+  document.getElementById('auth-subtitle').textContent = authMode === 'login' ? 'Inicia sesión' : 'Crea tu cuenta';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+async function handleAuthSubmit() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const errorEl = document.getElementById('auth-error');
+  errorEl.style.display = 'none';
+
+  if (!email || !password) {
+    errorEl.textContent = 'Completa correo y contraseña.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('auth-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Espera...';
+
+  try {
+    if (authMode === 'login') {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      currentUser = data.user;
+      showScreen('inicio');
+    } else {
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) throw error;
+      if (!data.session) {
+        errorEl.textContent = 'Cuenta creada. Revisa tu correo y confirma antes de iniciar sesión.';
+        errorEl.style.display = 'block';
+        errorEl.style.color = '#2a6b2a';
+        toggleAuthMode();
+        btn.disabled = false;
+        btn.textContent = 'Iniciar sesión';
+        return;
+      }
+      currentUser = data.user;
+      showScreen('inicio');
+    }
+  } catch (err) {
+    errorEl.textContent = traducirErrorAuth(err.message);
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
+  }
+}
+
+function traducirErrorAuth(msg) {
+  if (msg.includes('Invalid login credentials')) return 'Correo o contraseña incorrectos.';
+  if (msg.includes('already registered')) return 'Ese correo ya tiene una cuenta. Inicia sesión.';
+  if (msg.includes('Password should be')) return 'La contraseña debe tener al menos 6 caracteres.';
+  return 'Ocurrió un error: ' + msg;
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
+  showScreen('auth');
+}
+
+async function checkSession() {
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    currentUser = data.session.user;
+    showScreen('inicio');
+  } else {
+    showScreen('auth');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', checkSession);
+
+// ---------- NAVEGACIÓN ----------
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (name === 'diario') renderEntradas();
+  if (name === 'practica') resetRitualView();
+  if (name === 'altar') renderAltar();
+}
+
+// ---------- ALTAR (listado completo, checklist con guardado local) ----------
+const altarItems = {
+  "Velas": ["Vela azul (principal)", "Vela blanca (sustituto)", "Vela dorada (manifestación)", "Vela negra (corte de ataduras)"],
+  "Piedras y cristales": ["Lapislázuli", "Sodalita", "Zafiro", "Cuarzo azul", "Aventurina azul", "Labradorita"],
+  "Aromas e inciensos": ["Incienso de mirra", "Incienso de sándalo", "Aceite esencial de ruda"],
+  "Elementos de limpieza y protección": ["Sal (de mar o de cocina)", "Agua (bendita si tienes)", "Vaso o recipiente para el agua"],
+  "Símbolos e imágenes": ["Imagen o estampa de Miguel", "Pequeña espada o cruz", "Pluma blanca"],
+  "Para el altar en sí": ["Mantel blanco", "Flores blancas o azules", "Plato blanco", "Campana o llamador de ángeles (opcional)"],
+  "Para rituales específicos": ["Papel y lápiz", "Tijeras o un cordón (corte de ataduras)", "Objeto que represente tu meta (manifestación)"],
+};
+
+async function renderAltar() {
+  const cont = document.getElementById('altar-lista');
+  cont.innerHTML = '<p class="placeholder">Cargando...</p>';
+
+  const { data, error } = await sb.from('miguel_altar').select('categoria, item').eq('user_id', currentUser.id);
+  const marcados = new Set();
+  if (!error && data) {
+    data.forEach(row => marcados.add(row.categoria + '||' + row.item));
+  }
+
+  cont.innerHTML = Object.entries(altarItems).map(([categoria, items]) => `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:bold;color:#666;margin-bottom:4px;">${categoria}</div>
+      ${items.map((item) => {
+        const checked = marcados.has(categoria + '||' + item) ? 'checked' : '';
+        return `<label style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:14px;">
+          <input type="checkbox" ${checked} onchange="toggleAltarItem('${categoria.replace(/'/g, "\\'")}', '${item.replace(/'/g, "\\'")}', this.checked)">
+          ${item}
+        </label>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+async function toggleAltarItem(categoria, item, value) {
+  let error;
+  if (value) {
+    ({ error } = await sb.from('miguel_altar').insert({ user_id: currentUser.id, categoria, item }));
+  } else {
+    ({ error } = await sb.from('miguel_altar')
+      .delete()
+      .eq('user_id', currentUser.id)
+      .eq('categoria', categoria)
+      .eq('item', item));
+  }
+  if (error) {
+    alert('No se pudo actualizar: ' + error.message);
+    console.error(error);
+  }
+}
+
+// ---------- RITUAL GUIADO ----------
+const rituals = {
+  proteccion: {
+    title: "Ritual de Protección",
+    steps: [
+      { text: "Elige un espacio tranquilo y ordénalo antes de empezar.", timer: 0 },
+      { text: "Arma tu altar: plato blanco en el centro, vela azul sobre él, vaso con agua a un lado.", timer: 0 },
+      { text: "Escribe en la vela tu nombre y la palabra \"protección\".", timer: 0 },
+      { text: "Enciende el incienso y deja que el humo recorra el espacio.", timer: 0 },
+      { text: "Enciende la vela azul.", timer: 0 },
+      { text: "Respira profundo, contando diez respiraciones lentas.", timer: 40 },
+      { text: "Forma un círculo de sal alrededor de la vela.", timer: 0 },
+      { text: "Visualiza una luz azul que te envuelve de pies a cabeza, como una armadura.", timer: 20 },
+      { text: "Di: \"Arcángel Miguel, rodéame con tu luz. Que nada que no sea amor pueda tocarme.\"", timer: 0 },
+      { text: "Toma un sorbo de agua, sellando la protección.", timer: 0 },
+      { text: "Agradece y deja que la vela se consuma por completo. Ritual completo.", timer: 0 },
+    ],
+  },
+  claridad: {
+    title: "Ritual de Claridad y Decisión",
+    steps: [
+      { text: "Ordena tu espacio y siéntate sin interrupciones.", timer: 0 },
+      { text: "Escribe sin filtro la decisión que te bloquea.", timer: 0 },
+      { text: "Enciende la vela frente a ti.", timer: 0 },
+      { text: "Respira profundo tres veces.", timer: 15 },
+      { text: "Mira la llama unos segundos, sin pensar todavía en la pregunta.", timer: 10 },
+      { text: "Di: \"Miguel, corta la confusión. Muéstrame el camino con tu espada de luz.\"", timer: 0 },
+      { text: "Cierra los ojos y quédate en silencio.", timer: 150 },
+      { text: "Escribe lo primero que llegue a tu mente, sin juzgarlo.", timer: 0 },
+      { text: "Lee en voz alta lo que escribiste.", timer: 0 },
+      { text: "Agradece la claridad recibida.", timer: 0 },
+      { text: "Guarda el papel para releerlo en unos días. Ritual completo.", timer: 0 },
+    ],
+  },
+  manifestacion: {
+    title: "Ritual de Manifestación y Propósito",
+    steps: [
+      { text: "Elige una luna nueva o un domingo para este ritual.", timer: 0 },
+      { text: "Coloca el objeto que representa tu meta frente a ti.", timer: 0 },
+      { text: "Enciende la vela junto al objeto.", timer: 0 },
+      { text: "Respira profundo y cierra los ojos un momento.", timer: 15 },
+      { text: "Visualiza tu meta ya cumplida — no como deseo, sino como algo que ya está pasando.", timer: 20 },
+      { text: "Siente en el cuerpo cómo sería lograrlo.", timer: 20 },
+      { text: "Di: \"Miguel, dame el coraje para avanzar. Que tu fuerza sea mi fuerza.\"", timer: 0 },
+      { text: "Escribe una acción concreta para los próximos tres días.", timer: 0 },
+      { text: "Agradece, como si ya lo hubieras recibido.", timer: 0 },
+      { text: "Deja el objeto y la vela juntos hasta que se consuma.", timer: 0 },
+      { text: "Cumple la acción que escribiste. El ritual empieza cuando lo actúas.", timer: 0 },
+    ],
+  },
+  corte: {
+    title: "Ritual de Corte de Ataduras",
+    steps: [
+      { text: "Elige un momento tranquilo, sin apuro.", timer: 0 },
+      { text: "Escribe qué persona, situación o hábito quieres soltar.", timer: 0 },
+      { text: "Enciende la vela.", timer: 0 },
+      { text: "Sostén el cordón y nombra en voz baja lo que representa.", timer: 0 },
+      { text: "Respira y reconoce por qué ese lazo existió, sin juzgarte.", timer: 20 },
+      { text: "Di: \"Miguel, corta con tu espada los lazos que ya no me sirven. Libérame con amor, sin dañar a nadie.\"", timer: 0 },
+      { text: "Corta el cordón en dos, en un solo movimiento decidido.", timer: 0 },
+      { text: "Corta también el papel por la mitad.", timer: 0 },
+      { text: "Queda en silencio, notando qué cambió en el cuerpo.", timer: 20 },
+      { text: "Quema o rompe los pedazos y deséchalos fuera de casa.", timer: 0 },
+      { text: "Cierra agradeciendo la liberación. Ritual completo.", timer: 0 },
+    ],
+  },
+  hogar: {
+    title: "Ritual de Protección del Hogar",
+    steps: [
+      { text: "Elige un momento tranquilo en casa, sin visitas.", timer: 0 },
+      { text: "Ordena brevemente el espacio principal.", timer: 0 },
+      { text: "Mezcla un poco de sal en un vaso con agua.", timer: 0 },
+      { text: "Enciende incienso y recorre cada habitación.", timer: 0 },
+      { text: "Vuelve a la entrada principal y enciende la vela.", timer: 0 },
+      { text: "Camina por cada habitación con el agua, rociando las esquinas.", timer: 0 },
+      { text: "En cada habitación, di mentalmente: \"Que solo la luz y el amor habiten aquí.\"", timer: 0 },
+      { text: "En la puerta principal, di en voz alta: \"Miguel, protege este hogar. Que solo la luz y el amor crucen esta puerta.\"", timer: 0 },
+      { text: "Queda un momento sintiendo el ambiente.", timer: 20 },
+      { text: "Deja la vela encendida un rato, con supervisión.", timer: 0 },
+      { text: "Repite este ritual cuando sientas el ambiente pesado. Ritual completo.", timer: 0 },
+    ],
+  },
+  nocturno: {
+    title: "Ritual Nocturno",
+    steps: [
+      { text: "Prepara tu cuarto para dormir, bajando las luces.", timer: 0 },
+      { text: "Si tienes vela azul pequeña, enciéndela unos minutos antes.", timer: 0 },
+      { text: "Respira profundo tres veces.", timer: 15 },
+      { text: "Recita la oración de protección nocturna.", timer: 0 },
+      { text: "Imagina a Miguel de pie junto a tu cama, con la espada en alto, vigilando.", timer: 20 },
+      { text: "Repite mentalmente: \"Estoy protegido/a mientras duermo.\"", timer: 0 },
+      { text: "Apaga la vela antes de dormir.", timer: 0 },
+      { text: "Deja esa imagen contigo, sin esforzarte por mantenerla.", timer: 0 },
+      { text: "Si despiertas con miedo, repite la frase del paso 6.", timer: 0 },
+      { text: "Al despertar, agradece la noche de descanso. Ritual completo.", timer: 0 },
+    ],
+  },
+};
+
+let currentRitualId = null;
+let currentStep = 0;
+let timerInterval = null;
+
+function startRitual(id) {
+  currentRitualId = id;
+  document.getElementById('practica-lista').style.display = 'none';
+  document.getElementById('ritual-flow').style.display = 'block';
+  document.getElementById('ritual-titulo').textContent = rituals[id].title;
+  currentStep = 0;
+  renderStep();
+}
+
+function resetRitualView() {
+  document.getElementById('practica-lista').style.display = 'block';
+  document.getElementById('ritual-flow').style.display = 'none';
+  clearInterval(timerInterval);
+  currentRitualId = null;
+}
+
+function renderStep() {
+  clearInterval(timerInterval);
+  const steps = rituals[currentRitualId].steps;
+  const step = steps[currentStep];
+  document.getElementById('step-counter').textContent = `Paso ${currentStep + 1} de ${steps.length}`;
+  document.getElementById('step-content').textContent = step.text;
+  const timerEl = document.getElementById('step-timer');
+  const nextBtn = document.getElementById('next-btn');
+
+  if (step.timer > 0) {
+    let remaining = step.timer;
+    timerEl.style.display = 'block';
+    nextBtn.disabled = true;
+    nextBtn.textContent = 'Espera...';
+    timerEl.textContent = formatTime(remaining);
+    timerInterval = setInterval(() => {
+      remaining--;
+      timerEl.textContent = formatTime(remaining);
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        nextBtn.disabled = false;
+        nextBtn.textContent = currentStep === steps.length - 1 ? 'Finalizar' : 'Siguiente';
+      }
+    }, 1000);
+  } else {
+    timerEl.style.display = 'none';
+    nextBtn.disabled = false;
+    nextBtn.textContent = currentStep === steps.length - 1 ? 'Finalizar' : 'Siguiente';
+  }
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+function ritualNext() {
+  const steps = rituals[currentRitualId].steps;
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    renderStep();
+  } else {
+    resetRitualView();
+  }
+}
+
+function ritualPrev() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+// ---------- DIARIO (guardado real en Supabase) ----------
+async function guardarEntrada() {
+  const q1 = document.getElementById('q1').value;
+  const q2 = document.getElementById('q2').value;
+  const q3 = document.getElementById('q3').value;
+  if (!q1 && !q2 && !q3) {
+    alert('Escribe al menos una respuesta antes de guardar.');
+    return;
+  }
+  const { error } = await sb.from('miguel_diario').insert({
+    user_id: currentUser.id, q1, q2, q3,
+  });
+  if (error) {
+    alert('No se pudo guardar: ' + error.message);
+    return;
+  }
+  document.getElementById('q1').value = '';
+  document.getElementById('q2').value = '';
+  document.getElementById('q3').value = '';
+  renderEntradas();
+}
+
+async function renderEntradas() {
+  const cont = document.getElementById('lista-entradas');
+  cont.innerHTML = '<p class="placeholder">Cargando...</p>';
+  const { data, error } = await sb
+    .from('miguel_diario')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('fecha', { ascending: false });
+
+  if (error) {
+    cont.innerHTML = '<p class="placeholder">No se pudieron cargar las entradas.</p>';
+    return;
+  }
+  if (!data || data.length === 0) {
+    cont.innerHTML = '<p class="placeholder">Todavía no escribiste ninguna entrada.</p>';
+    return;
+  }
+  cont.innerHTML = data.map(e => {
+    const fecha = new Date(e.fecha).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
+    return `
+    <div class="entry">
+      <div class="date">${fecha}</div>
+      ${e.q1 ? `<div>${e.q1}</div>` : ''}
+      ${e.q2 ? `<div>${e.q2}</div>` : ''}
+      ${e.q3 ? `<div>${e.q3}</div>` : ''}
+    </div>
+  `;
+  }).join('');
+}
+</script>
+</body>
+</html>
