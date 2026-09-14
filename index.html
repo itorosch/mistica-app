@@ -329,6 +329,7 @@ window.addEventListener('DOMContentLoaded', checkSession);
 
 // ---------- NAVEGACIÓN ----------
 function showScreen(name) {
+  window.scrollTo(0, 0);
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
   if (name === 'diario') renderEntradas();
