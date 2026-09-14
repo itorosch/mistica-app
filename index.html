@@ -11,7 +11,11 @@
     font-family: system-ui, sans-serif;
     max-width: 480px;
     margin: 0 auto;
-    padding: 20px;
+    padding:
+      calc(28px + env(safe-area-inset-top))
+      calc(28px + env(safe-area-inset-right))
+      calc(28px + env(safe-area-inset-bottom))
+      calc(28px + env(safe-area-inset-left));
     background: #f2f2f2;
     color: #222;
   }
@@ -51,7 +55,9 @@
   .auth-box { max-width: 320px; margin: 60px auto 0; }
   .error-msg { color: #b00020; font-size: 13px; margin-top: -8px; margin-bottom: 12px; }
   .link-btn { background: none; border: none; color: #333; text-decoration: underline; font-size: 13px; padding: 4px 0; }
-  .logout-link { position: absolute; top: 20px; right: 20px; font-size: 12px; color: #888; background: none; border: none; text-decoration: underline; cursor: pointer; }
+  .inicio-header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .inicio-header h1 { margin: 0; min-width: 0; }
+  .logout-link { position: static; flex-shrink: 0; font-size: 12px; color: #888; background: none; border: none; text-decoration: underline; cursor: pointer; padding: 4px 0; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -75,8 +81,10 @@
 
 <!-- INICIO -->
 <div class="screen" id="screen-inicio">
-  <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
-  <h1>Arcángel Miguel</h1>
+  <div class="inicio-header">
+    <h1>Arcángel Miguel</h1>
+    <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
+  </div>
   <p class="subtitle">¿Qué necesitas hoy?</p>
   <div class="grid">
     <button class="nav-btn" onclick="showScreen('practica')">
