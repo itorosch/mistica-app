@@ -19,6 +19,11 @@
     background: #f2f2f2;
     color: #222;
   }
+  body.inicio-background {
+    background-image: url('https://d8j0ntlcm91z4.cloudfront.net/user_3JHNgLP0wZClV3x1ig9dfSFY5c9/hf_20260915_160103_311de9cb-fb65-49dd-b254-3599b7d7ac95.png');
+    background-repeat: repeat;
+    background-size: auto;
+  }
   .screen { display: none; }
   .screen.active { display: block; }
   h1 { font-size: 22px; margin-bottom: 4px; }
@@ -330,6 +335,7 @@ window.addEventListener('DOMContentLoaded', checkSession);
 // ---------- NAVEGACIÓN ----------
 function showScreen(name) {
   window.scrollTo(0, 0);
+  document.body.classList.toggle('inicio-background', name === 'inicio');
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
   if (name === 'diario') renderEntradas();
