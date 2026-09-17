@@ -12,20 +12,60 @@
   * { box-sizing: border-box; }
   body {
     font-family: system-ui, sans-serif;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding:
-      calc(28px + env(safe-area-inset-top))
-      calc(28px + env(safe-area-inset-right))
-      calc(28px + env(safe-area-inset-bottom))
-      calc(28px + env(safe-area-inset-left));
-    background: #f2f2f2;
+    margin: 0;
+    padding: 0;
+    background: #000;
     color: #222;
   }
-  body.inicio-background {
-    background-image: url('https://d8j0ntlcm91z4.cloudfront.net/user_3JHNgLP0wZClV3x1ig9dfSFY5c9/hf_20260916_001341_ad411805-1c2c-4a1a-b072-6a10d066096f.png');
-    background-repeat: repeat;
-    background-size: auto;
+  #screen-inicio {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  #screen-inicio.active { display: flex; }
+  .inicio-artwork {
+    position: relative;
+    width: min(100vw, calc(100vh * 2160 / 3840));
+    height: min(100vh, calc(100vw * 3840 / 2160));
+    aspect-ratio: 2160 / 3840;
+  }
+  .inicio-artwork picture,
+  .inicio-artwork img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .inicio-artwork img {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .inicio-hotspot {
+    position: absolute;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    cursor: pointer;
+  }
+  .inicio-hotspot.practica { left: 10%; top: 32%; width: 37%; height: 23%; }
+  .inicio-hotspot.diario { left: 53%; top: 32%; width: 37%; height: 23%; }
+  .inicio-hotspot.explora { left: 10%; top: 57%; width: 37%; height: 23%; }
+  .inicio-hotspot.altar { left: 53%; top: 57%; width: 37%; height: 23%; }
+  @media (min-width: 800px) {
+    .inicio-artwork {
+      width: min(100vw, calc(100vh * 3840 / 2160));
+      height: min(100vh, calc(100vw * 2160 / 3840));
+      aspect-ratio: 3840 / 2160;
+    }
+    .inicio-hotspot.practica { left: 10%; top: 37%; width: 16%; height: 40%; }
+    .inicio-hotspot.diario { left: 30%; top: 37%; width: 16%; height: 40%; }
+    .inicio-hotspot.explora { left: 54%; top: 37%; width: 16%; height: 40%; }
+    .inicio-hotspot.altar { left: 74%; top: 37%; width: 16%; height: 40%; }
   }
   .screen:not(#screen-inicio) { max-width: 480px; margin: 0 auto; }
   .corner {
@@ -149,33 +189,15 @@
 
 <!-- INICIO -->
 <div class="screen" id="screen-inicio">
-  <img class="corner top-left" src="https://d8j0ntlcm91z4.cloudfront.net/user_3JHNgLP0wZClV3x1ig9dfSFY5c9/hf_20260916_001557_39906ee7-7bdb-4b15-a845-bfa94eb4c79d.png" alt="" aria-hidden="true">
-  <img class="corner top-right" src="https://d8j0ntlcm91z4.cloudfront.net/user_3JHNgLP0wZClV3x1ig9dfSFY5c9/hf_20260916_001557_39906ee7-7bdb-4b15-a845-bfa94eb4c79d.png" alt="" aria-hidden="true">
-  <img class="corner bottom-left" src="https://d8j0ntlcm91z4.cloudfront.net/user_3JHNgLP0wZClV3x1ig9dfSFY5c9/hf_20260916_001557_39906ee7-7bdb-4b15-a845-bfa94eb4c79d.png" alt="" aria-hidden="true">
-  <img class="corner bottom-right" src="https://d8j0ntlcm91z4.cloudfront.net/user_3JHNgLP0wZClV3x1ig9dfSFY5c9/hf_20260916_001557_39906ee7-7bdb-4b15-a845-bfa94eb4c79d.png" alt="" aria-hidden="true">
-  <img class="inicio-emblem" src="https://d8j0ntlcm91z4.cloudfront.net/user_3JHNgLP0wZClV3x1ig9dfSFY5c9/hf_20260916_001559_2b0fc977-7b30-4504-b84c-953bd0ac47f2.png" alt="" aria-hidden="true">
-  <div class="inicio-header">
-    <h1>ARCÁNGEL MIGUEL</h1>
-    <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
-  </div>
-  <p class="subtitle inicio-subtitle">¿Qué necesitas hoy?</p>
-  <div class="grid inicio-grid">
-    <button class="nav-btn inicio-card" onclick="showScreen('practica')">
-      <span class="label">Practica</span>
-      <span class="desc">Rituales y oraciones</span>
-    </button>
-    <button class="nav-btn inicio-card" onclick="showScreen('diario')">
-      <span class="label">Diario</span>
-      <span class="desc">Tus reflexiones</span>
-    </button>
-    <button class="nav-btn inicio-card" onclick="showScreen('explora')">
-      <span class="label">Explora</span>
-      <span class="desc">Conocé a Miguel</span>
-    </button>
-    <button class="nav-btn inicio-card" onclick="showScreen('altar')">
-      <span class="label">Altar</span>
-      <span class="desc">Tu checklist</span>
-    </button>
+  <div class="inicio-artwork">
+    <picture>
+      <source media="(min-width: 800px)" srcset="assets/papiro-web.png">
+      <img src="assets/papiro-mobile.png" alt="">
+    </picture>
+    <button class="inicio-hotspot practica" aria-label="Practica" onclick="showScreen('practica')"></button>
+    <button class="inicio-hotspot diario" aria-label="Diario" onclick="showScreen('diario')"></button>
+    <button class="inicio-hotspot explora" aria-label="Explora" onclick="showScreen('explora')"></button>
+    <button class="inicio-hotspot altar" aria-label="Altar" onclick="showScreen('altar')"></button>
   </div>
 </div>
 
