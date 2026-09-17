@@ -28,9 +28,8 @@
   #screen-inicio.active { display: flex; }
   .inicio-artwork {
     position: relative;
-    padding: 10px;
-    width: min(100vw, calc(100vh * 2160 / 3840));
-    height: min(100vh, calc(100vw * 3840 / 2160));
+    width: 100vw;
+    height: 100vh;
     aspect-ratio: 2160 / 3840;
   }
   .inicio-artwork picture,
@@ -59,9 +58,8 @@
   .inicio-hotspot.altar { left: 53%; top: 57%; width: 37%; height: 23%; }
   @media (min-width: 800px) {
     .inicio-artwork {
-      padding: 30px;
-      width: min(100vw, calc(100vh * 3840 / 2160));
-      height: min(100vh, calc(100vw * 2160 / 3840));
+      width: 100vw;
+      height: 100vh;
       aspect-ratio: 3840 / 2160;
     }
     .inicio-hotspot.practica { left: 10%; top: 37%; width: 16%; height: 40%; }
@@ -193,8 +191,8 @@
 <div class="screen" id="screen-inicio">
   <div class="inicio-artwork">
     <picture>
-      <source media="(min-width: 800px)" srcset="assets/papiro-web.png">
-      <img src="assets/papiro-mobile.png" alt="">
+      <source media="(min-width: 800px)" srcset="assets/papiro-web-2.png">
+      <img src="assets/papiro-mobile-2.png" alt="">
     </picture>
     <button class="inicio-hotspot practica" aria-label="Practica" onclick="showScreen('practica')"></button>
     <button class="inicio-hotspot diario" aria-label="Diario" onclick="showScreen('diario')"></button>
