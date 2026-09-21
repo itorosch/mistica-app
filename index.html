@@ -9,18 +9,71 @@
   * { box-sizing: border-box; }
   body {
     font-family: system-ui, sans-serif;
-    max-width: 480px;
-    margin: 0 auto;
-    padding:
-      calc(28px + env(safe-area-inset-top))
-      calc(28px + env(safe-area-inset-right))
-      calc(28px + env(safe-area-inset-bottom))
-      calc(28px + env(safe-area-inset-left));
-    background: #f2f2f2;
-    color: #222;
+    margin: 0;
+    padding: 0;
+    background: #264653;
+    color: #fff;
+    overflow-x: hidden;
   }
-  .screen { display: none; }
+  .screen {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+  }
   .screen.active { display: block; }
+  .screen-header {
+    width: 100%;
+    aspect-ratio: 2560 / 900;
+    background: #2A9D8F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .screen-header h1 {
+    margin: 0;
+    color: #fff;
+    text-align: center;
+    font-size: clamp(24px, 5vw, 52px);
+  }
+  .screen-body {
+    width: 100%;
+    min-height: calc(100vw * 1440 / 2560);
+    aspect-ratio: 2560 / 1440;
+    background: #264653;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: clamp(24px, 4vw, 64px) 24px;
+  }
+  .screen-body > .screen-content {
+    width: min(100%, 900px);
+    margin: 0 auto;
+  }
+  .screen-body .subtitle {
+    color: #fff;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  .screen-body .back-btn {
+    color: #fff;
+  }
+  .screen-footer {
+    width: 100%;
+    aspect-ratio: 2560 / 700;
+    background: #1B2A32;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 24px;
+  }
+  .screen-footer .logout-link {
+    color: #fff;
+  }
   h1 { font-size: 22px; margin-bottom: 4px; }
   h2 { font-size: 18px; margin-top: 0; }
   p.subtitle { color: #666; margin-top: 0; margin-bottom: 20px; }
@@ -81,106 +134,140 @@
 
 <!-- INICIO -->
 <div class="screen" id="screen-inicio">
-  <div class="inicio-header">
-    <h1>Arcángel Miguel</h1>
+  <header class="screen-header">
+    <h1>ARCÁNGEL MIGUEL</h1>
+  </header>
+  <main class="screen-body">
+    <div class="screen-content">
+      <p class="subtitle">¿Qué necesitas hoy?</p>
+      <div class="grid">
+        <button class="nav-btn" onclick="showScreen('practica')">
+          <span class="label">Practica</span>
+          <span class="desc">Rituales y oraciones</span>
+        </button>
+        <button class="nav-btn" onclick="showScreen('diario')">
+          <span class="label">Diario</span>
+          <span class="desc">Tus reflexiones</span>
+        </button>
+        <button class="nav-btn" onclick="showScreen('explora')">
+          <span class="label">Explora</span>
+          <span class="desc">Conocé a Miguel</span>
+        </button>
+        <button class="nav-btn" onclick="showScreen('altar')">
+          <span class="label">Altar</span>
+          <span class="desc">Tu checklist</span>
+        </button>
+      </div>
+    </div>
+  </main>
+  <footer class="screen-footer">
+    <span>Contacto</span>
     <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
-  </div>
-  <p class="subtitle">¿Qué necesitas hoy?</p>
-  <div class="grid">
-    <button class="nav-btn" onclick="showScreen('practica')">
-      <span class="label">Practica</span>
-      <span class="desc">Rituales y oraciones</span>
-    </button>
-    <button class="nav-btn" onclick="showScreen('diario')">
-      <span class="label">Diario</span>
-      <span class="desc">Tus reflexiones</span>
-    </button>
-    <button class="nav-btn" onclick="showScreen('explora')">
-      <span class="label">Explora</span>
-      <span class="desc">Conocé a Miguel</span>
-    </button>
-    <button class="nav-btn" onclick="showScreen('altar')">
-      <span class="label">Altar</span>
-      <span class="desc">Tu checklist</span>
-    </button>
-  </div>
+  </footer>
 </div>
 
 <!-- PRACTICA -->
 <div class="screen" id="screen-practica">
-  <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
-  <h2>Practica</h2>
-  <div id="practica-lista">
-    <div class="card">
-      <strong>Ritual de Protección</strong>
-      <p style="font-size:13px;color:#666;margin:6px 0;">Para cuando sientes que necesitas un escudo extra.</p>
-      <button class="primary-btn" onclick="startRitual('proteccion')">Comenzar</button>
-    </div>
-    <div class="card">
-      <strong>Ritual de Claridad y Decisión</strong>
-      <p style="font-size:13px;color:#666;margin:6px 0;">Para cuando estás frente a una decisión difícil.</p>
-      <button class="primary-btn" onclick="startRitual('claridad')">Comenzar</button>
-    </div>
-    <div class="card">
-      <strong>Ritual de Manifestación y Propósito</strong>
-      <p style="font-size:13px;color:#666;margin:6px 0;">Para avanzar hacia una meta con coraje.</p>
-      <button class="primary-btn" onclick="startRitual('manifestacion')">Comenzar</button>
-    </div>
-    <div class="card">
-      <strong>Ritual de Corte de Ataduras</strong>
-      <p style="font-size:13px;color:#666;margin:6px 0;">Para soltar lo que ya no sirve.</p>
-      <button class="primary-btn" onclick="startRitual('corte')">Comenzar</button>
-    </div>
-    <div class="card">
-      <strong>Ritual de Protección del Hogar</strong>
-      <p style="font-size:13px;color:#666;margin:6px 0;">Para limpiar y proteger tu espacio.</p>
-      <button class="primary-btn" onclick="startRitual('hogar')">Comenzar</button>
-    </div>
-    <div class="card">
-      <strong>Ritual Nocturno</strong>
-      <p style="font-size:13px;color:#666;margin:6px 0;">Para un descanso protegido.</p>
-      <button class="primary-btn" onclick="startRitual('nocturno')">Comenzar</button>
-    </div>
-  </div>
+  <header class="screen-header">
+    <h1>PRACTICA</h1>
+  </header>
+  <main class="screen-body">
+    <div class="screen-content">
+      <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
+      <p class="subtitle">Elige tu ritual</p>
+      <div id="practica-lista">
+        <div class="card">
+          <strong>Ritual de Protección</strong>
+          <p style="font-size:13px;color:#666;margin:6px 0;">Para cuando sientes que necesitas un escudo extra.</p>
+          <button class="primary-btn" onclick="startRitual('proteccion')">Comenzar</button>
+        </div>
+        <div class="card">
+          <strong>Ritual de Claridad y Decisión</strong>
+          <p style="font-size:13px;color:#666;margin:6px 0;">Para cuando estás frente a una decisión difícil.</p>
+          <button class="primary-btn" onclick="startRitual('claridad')">Comenzar</button>
+        </div>
+        <div class="card">
+          <strong>Ritual de Manifestación y Propósito</strong>
+          <p style="font-size:13px;color:#666;margin:6px 0;">Para avanzar hacia una meta con coraje.</p>
+          <button class="primary-btn" onclick="startRitual('manifestacion')">Comenzar</button>
+        </div>
+        <div class="card">
+          <strong>Ritual de Corte de Ataduras</strong>
+          <p style="font-size:13px;color:#666;margin:6px 0;">Para soltar lo que ya no sirve.</p>
+          <button class="primary-btn" onclick="startRitual('corte')">Comenzar</button>
+        </div>
+        <div class="card">
+          <strong>Ritual de Protección del Hogar</strong>
+          <p style="font-size:13px;color:#666;margin:6px 0;">Para limpiar y proteger tu espacio.</p>
+          <button class="primary-btn" onclick="startRitual('hogar')">Comenzar</button>
+        </div>
+        <div class="card">
+          <strong>Ritual Nocturno</strong>
+          <p style="font-size:13px;color:#666;margin:6px 0;">Para un descanso protegido.</p>
+          <button class="primary-btn" onclick="startRitual('nocturno')">Comenzar</button>
+        </div>
+      </div>
 
-  <!-- Flujo guiado del ritual -->
-  <div id="ritual-flow" style="display:none;">
-    <h2 id="ritual-titulo" style="font-size:16px;"></h2>
-    <div class="step-counter" id="step-counter"></div>
-    <div class="step-box" id="step-content"></div>
-    <div class="timer" id="step-timer" style="display:none;"></div>
-    <div class="row">
-      <button onclick="ritualPrev()">Anterior</button>
-      <button class="primary-btn" onclick="ritualNext()" id="next-btn">Siguiente</button>
+      <!-- Flujo guiado del ritual -->
+      <div id="ritual-flow" style="display:none;">
+        <h2 id="ritual-titulo" style="font-size:16px;"></h2>
+        <div class="step-counter" id="step-counter"></div>
+        <div class="step-box" id="step-content"></div>
+        <div class="timer" id="step-timer" style="display:none;"></div>
+        <div class="row">
+          <button onclick="ritualPrev()">Anterior</button>
+          <button class="primary-btn" onclick="ritualNext()" id="next-btn">Siguiente</button>
+        </div>
+      </div>
     </div>
-  </div>
+  </main>
+  <footer class="screen-footer">
+    <span>Contacto</span>
+    <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
+  </footer>
 </div>
 
 <!-- DIARIO -->
 <div class="screen" id="screen-diario">
-  <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
-  <h2>Tu diario con Miguel</h2>
-  <p class="subtitle">Se guarda automáticamente en la nube — disponible desde cualquier dispositivo donde inicies sesión.</p>
+  <header class="screen-header">
+    <h1>DIARIO</h1>
+  </header>
+  <main class="screen-body">
+    <div class="screen-content">
+      <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
+      <p class="subtitle">Tus reflexiones</p>
+      <p class="subtitle">Se guarda automáticamente en la nube — disponible desde cualquier dispositivo donde inicies sesión.</p>
 
-  <label><strong>¿De qué necesitas protegerte hoy?</strong></label>
-  <textarea id="q1" placeholder="Escribe acá..."></textarea>
+      <label><strong>¿De qué necesitas protegerte hoy?</strong></label>
+      <textarea id="q1" placeholder="Escribe acá..."></textarea>
 
-  <label><strong>¿Qué decisión estás postergando?</strong></label>
-  <textarea id="q2" placeholder="Escribe acá..."></textarea>
+      <label><strong>¿Qué decisión estás postergando?</strong></label>
+      <textarea id="q2" placeholder="Escribe acá..."></textarea>
 
-  <label><strong>Si tuvieras el coraje de Miguel hoy, ¿qué harías distinto?</strong></label>
-  <textarea id="q3" placeholder="Escribe acá..."></textarea>
+      <label><strong>Si tuvieras el coraje de Miguel hoy, ¿qué harías distinto?</strong></label>
+      <textarea id="q3" placeholder="Escribe acá..."></textarea>
 
-  <button class="primary-btn" onclick="guardarEntrada()">Guardar entrada</button>
+      <button class="primary-btn" onclick="guardarEntrada()">Guardar entrada</button>
 
-  <h2 style="margin-top:30px;">Entradas anteriores</h2>
-  <div id="lista-entradas"></div>
+      <h2 style="margin-top:30px;">Entradas anteriores</h2>
+      <div id="lista-entradas"></div>
+    </div>
+  </main>
+  <footer class="screen-footer">
+    <span>Contacto</span>
+    <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
+  </footer>
 </div>
 
 <!-- EXPLORA -->
 <div class="screen" id="screen-explora">
-  <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
-  <h2>Explora</h2>
+  <header class="screen-header">
+    <h1>EXPLORA</h1>
+  </header>
+  <main class="screen-body">
+    <div class="screen-content">
+      <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
+      <p class="subtitle">Conocé a Miguel</p>
 
   <div class="card">
     <strong>¿Quién es el Arcángel Miguel?</strong>
@@ -225,16 +312,33 @@
       <p><b>¿Por qué a veces se lo asocia con el color rojo o amarillo, no solo azul?</b><br>Distintas escuelas esotéricas asignan colores distintos a cada arcángel. El azul es el más consistente entre fuentes, pero no es universal.</p>
     </div>
   </div>
+    </div>
+  </main>
+  <footer class="screen-footer">
+    <span>Contacto</span>
+    <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
+  </footer>
 </div>
 
 <!-- ALTAR -->
 <div class="screen" id="screen-altar">
-  <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
-  <h2>Tu altar</h2>
-  <p class="subtitle">Todos los elementos usados en los rituales y la tradición de Miguel. Marca lo que ya tienes — se guarda en este dispositivo.</p>
-  <div class="card">
-    <div id="altar-lista"></div>
-  </div>
+  <header class="screen-header">
+    <h1>ALTAR</h1>
+  </header>
+  <main class="screen-body">
+    <div class="screen-content">
+      <button class="back-btn" onclick="showScreen('inicio')">&larr; Inicio</button>
+      <p class="subtitle">Tu checklist</p>
+      <p class="subtitle">Todos los elementos usados en los rituales y la tradición de Miguel. Marca lo que ya tienes — se guarda en este dispositivo.</p>
+      <div class="card">
+        <div id="altar-lista"></div>
+      </div>
+    </div>
+  </main>
+  <footer class="screen-footer">
+    <span>Contacto</span>
+    <button class="logout-link" onclick="handleLogout()">Cerrar sesión</button>
+  </footer>
 </div>
 
 <script>
