@@ -19,8 +19,9 @@
     display: none;
     position: static;
     width: 100%;
-    min-height: 100vh;
+    min-height: 0;
     margin: 0;
+    overflow: visible;
   }
   .screen.active { display: block; }
   .screen-header {
@@ -44,7 +45,7 @@
     position: static;
     width: 100%;
     height: auto;
-    min-height: calc(100vw * 1440 / 2560);
+    min-height: 0;
     aspect-ratio: auto;
     background: #264653;
     color: #fff;
@@ -69,7 +70,9 @@
     display: block;
     position: static;
     width: 100%;
-    aspect-ratio: 2560 / 700;
+    min-height: calc(100vw * 700 / 2560);
+    height: auto;
+    aspect-ratio: auto;
     background: #1B2A32;
     color: #fff;
     margin: 0;
