@@ -17,18 +17,21 @@
   }
   .screen {
     display: none;
+    position: static;
     width: 100%;
     min-height: 100vh;
+    margin: 0;
   }
   .screen.active { display: block; }
   .screen-header {
+    display: block;
+    position: static;
     width: 100%;
     aspect-ratio: 2560 / 900;
     background: #2A9D8F;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0;
     padding: 24px;
+    text-align: center;
   }
   .screen-header h1 {
     margin: 0;
@@ -37,14 +40,16 @@
     font-size: clamp(24px, 5vw, 52px);
   }
   .screen-body {
+    display: block;
+    position: static;
     width: 100%;
+    height: auto;
     min-height: calc(100vw * 1440 / 2560);
     aspect-ratio: 2560 / 1440;
     background: #264653;
     color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    margin: 0;
+    overflow: visible;
     padding: clamp(24px, 4vw, 64px) 24px;
   }
   .screen-body > .screen-content {
@@ -61,18 +66,19 @@
     color: #fff;
   }
   .screen-footer {
+    display: block;
+    position: static;
     width: 100%;
     aspect-ratio: 2560 / 700;
     background: #1B2A32;
     color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
+    margin: 0;
     padding: 24px;
+    text-align: center;
   }
   .screen-footer .logout-link {
     color: #fff;
+    margin-left: 32px;
   }
   h1 { font-size: 22px; margin-bottom: 4px; }
   h2 { font-size: 18px; margin-top: 0; }
