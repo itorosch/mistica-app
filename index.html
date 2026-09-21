@@ -23,7 +23,10 @@
     margin: 0;
     overflow: visible;
   }
-  .screen.active { display: block; }
+  .screen.active {
+    display: flex;
+    flex-direction: column;
+  }
   .screen-header {
     display: block;
     position: static;
@@ -47,6 +50,7 @@
     height: auto;
     min-height: 0;
     aspect-ratio: auto;
+    flex: 0 0 auto;
     background: #264653;
     color: #fff;
     margin: 0;
@@ -73,6 +77,7 @@
     min-height: calc(100vw * 700 / 2560);
     height: auto;
     aspect-ratio: auto;
+    flex: 0 0 auto;
     background: #1B2A32;
     color: #fff;
     margin: 0;
